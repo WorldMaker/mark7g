@@ -102,3 +102,13 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Secrets, shh
+secrets.json
+
+# Typescript outputs
+**/*.js
+**/*.js.map
+
+# State dumps
+store.json

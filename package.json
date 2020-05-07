@@ -1,0 +1,40 @@
+{
+  "name": "mark7g",
+  "version": "1.0.0",
+  "description": "Discord bureaucrat",
+  "main": "index.js",
+  "dependencies": {
+    "discord.js": "^12.2.0",
+    "immer": "^6.0.5",
+    "redux": "^4.0.5",
+    "redux-observable": "^1.2.0",
+    "rxjs": "^6.5.5"
+  },
+  "devDependencies": {
+    "@types/node": "^13.13.5",
+    "@types/ws": "^7.2.4",
+    "eslint": "^6.8.0",
+    "eslint-config-standard-with-typescript": "^16.0.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "typescript": "^3.8.3"
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "prestart": "npm run build",
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WorldMaker/mark7g.git"
+  },
+  "author": "Max Battcher <me@worldmaker.net>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/WorldMaker/mark7g/issues"
+  },
+  "homepage": "https://github.com/WorldMaker/mark7g#readme"
+}
