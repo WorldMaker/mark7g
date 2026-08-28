@@ -333,7 +333,7 @@ export const EverdeckCards: readonly EverdeckCard[] = Object.freeze([
     new Card('⭐', 9, 'Weaver', 5, 'Spider'),
     // ♣️ XJQKA
     new Card('♣️', 'X', 'Excuse', 1, 'Seahorse'),
-    new Card('♣️', 'J', 'Xroads', 5, 'Firefly'),
+    new Card('♣️', 'J', 'X-roads', 5, 'Firefly'),
     new Card('♣️', 'Q', 'Artistry', 1, 'Manta'),
     new Card('♣️', 'K', 'Exemplar', 1, 'Dolphin'),
     new Card('♣️', 'A', 'Aeon', 2, 'Elephant'),
@@ -400,6 +400,7 @@ export function everdeckLetter(id: number): string {
     }
     return '🃏'
 }
+
 export function pcSuitEmoji(id: number): string {
     if (isClosed(id)) {
         return '🎴'
@@ -427,6 +428,69 @@ export function everdeckSuitEmoji(id: number): string {
     }
     const card = EverdeckCards[id]
     return card.suit
+}
+
+export function tarotSuitEmoji(id: number): string {
+    if (isClosed(id)) {
+        return '🎴'
+    }
+    if (id < 0 || id >= 120) {
+        return '🪧'
+    }
+    const card = EverdeckCards[id]
+    switch (card.suit) {
+        case '♥️':
+        case '♦️':
+        case '🌙':
+        case '⭐':
+            return card.suit
+        default: return ''
+    }
+}
+
+export function tarotRankEmoji(id: number): string {
+    if (isClosed(id)) {
+        return '🎴'
+    }
+    if (id < 0 || id >= 120) {
+        return '🪧'
+    }
+    const card = EverdeckCards[id]
+    switch (card.suit) {
+        case '♣️':
+        case '♠️':
+            if (card.sequence < 20) {
+                return `${card.sequence} — ${card.word}`
+            }
+            if (card.rank === 'A' && card.suit === '♣️') {
+                return `20 — Judgment`
+            }
+            if (card.rank === 'A' && card.suit === '♠️') {
+                return `21 — World`
+            }
+            return '🪧'
+        default:
+            if (card.rank === 0) {
+                return '10'
+            }
+            if (card.rank === 'X') {
+                return 'Page'
+            }
+            if (typeof card.rank === 'number') {
+                return card.rank.toString()
+            }
+            return card.rank
+    }
+}
+
+export function tarotCardEmoji(id: number): string {
+    if (isClosed(id)) {
+        return '🎴'
+    }
+    if (id < 0 || id >= 120) {
+        return '🪧'
+    }
+    return `${tarotRankEmoji(id)}${tarotSuitEmoji(id)}`
 }
 
 export function suitColor(emoji: EverdeckSuit): 'black' | 'red' | 'yellow' | 'blue' {
