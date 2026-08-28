@@ -1,0 +1,8 @@
+{
+  "fmt": {
+    "semiColons": false,
+    "singleQuote": true,
+    "exclude": ["dist"]
+  },
+  "workspace": ["src/bot"]
+}
