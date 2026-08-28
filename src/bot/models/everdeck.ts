@@ -20,10 +20,12 @@
  */
 export const ClosedFlag = 1 << 7
 
-export const ClosedMask = ~ClosedFlag
-
 export function isClosed(card: number): boolean {
   return (card & ClosedFlag) !== 0
+}
+
+export function flipClosed(card: number): number {
+  return card ^ ClosedFlag
 }
 
 /**
