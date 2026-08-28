@@ -169,7 +169,7 @@ export type EverdeckRank =
   | 8
   | 9
   | EverdeckFaceRank
-export type EverdeckPoints = 0 | 1 | 2 | 3 | 4 | 5
+export type EverdeckPoints = 1 | 2 | 3 | 4 | 5
 
 export interface EverdeckCard {
   readonly suit: EverdeckSuit
@@ -429,6 +429,70 @@ export function everdeckLetter(id: number): string {
     return EverdeckCards[id].letter
   }
   return '🃏'
+}
+
+export function everdeckPointsEmoji(id: number): string {
+  if (isClosed(id)) {
+    return '🎴'
+  }
+  if (id >= 0 && id < 120) {
+    switch (EverdeckCards[id].points) {
+      case 1:
+        return '❶'
+      case 2:
+        return '❷'
+      case 3:
+        return '❸'
+      case 4:
+        return '❹'
+      case 5:
+        return '❺'
+    }
+  }
+  return ''
+}
+
+export function everdeckLetterEmoji(id: number): string {
+  if (isClosed(id)) {
+    return '🎴'
+  }
+  return `${everdeckLetter(id)}${everdeckPointsEmoji(id)}`
+}
+
+export function everdeckAnimalEmoji(id: number): string {
+  if (isClosed(id)) {
+    return '🎴'
+  }
+  if (id >= 0 && id < 120) {
+    const card = EverdeckCards[id]
+    switch (card.animal) {
+      case 'Bear':
+        return '🐻 Bear'
+      case 'Cat':
+        return '🐈 Cat'
+      case 'Cow':
+        return '🐄 Cow'
+      case 'Giraffe':
+        return '🦒 Giraffe'
+      case 'Horse':
+        return '🐎 Horse'
+      case 'Lion':
+        return '🦁 Lion'
+      case 'Owl':
+        return '🦉 Owl'
+      case 'Panda':
+        return '🐼 Panda'
+      case 'Puppy':
+        return '🐶 Puppy'
+      case 'Snake':
+        return '🐍 Snake'
+      case 'Turtle':
+        return '🐢 Turtle'
+      default:
+        return card.animal
+    }
+  }
+  return '🪧'
 }
 
 export function pcSuitEmoji(id: number): string {
