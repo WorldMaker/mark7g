@@ -1,5 +1,17 @@
 import { assertEquals } from '@std/assert'
-import { EverdeckCards } from './everdeck.ts'
+import {
+  DeckFMarker,
+  DeckGMarker,
+  DeckHMarker,
+  DeckJMarker,
+  DeckKMarker,
+  DeckMMarker,
+  DiscardPileMarker,
+  DrawPileMarker,
+  EverdeckCards,
+  HandMarker,
+  SpreadMarker,
+} from './everdeck.ts'
 
 Deno.test('sequence number matches card lookup order', () => {
   assertEquals(EverdeckCards.length, 120)
@@ -18,4 +30,17 @@ Deno.test('animals are pairs', () => {
   for (const [animal, count] of Object.entries(animalCounts)) {
     assertEquals(count, 2, `Animal ${animal} does not have a pair`)
   }
+})
+
+Deno.test('type value of markers are equal', () => {
+  assertEquals(DiscardPileMarker, 127)
+  assertEquals(DrawPileMarker, 383)
+  assertEquals(SpreadMarker, 126)
+  assertEquals(HandMarker, 382)
+  assertEquals(DeckFMarker, 376)
+  assertEquals(DeckGMarker, 377)
+  assertEquals(DeckHMarker, 378)
+  assertEquals(DeckJMarker, 379)
+  assertEquals(DeckKMarker, 380)
+  assertEquals(DeckMMarker, 381)
 })

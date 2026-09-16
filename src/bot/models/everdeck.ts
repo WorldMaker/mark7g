@@ -33,10 +33,15 @@ export function flipClosed(card: number): number {
  */
 export const DiscardPileMarker = 127
 
+export type DiscardPileMarker = 127
+
 /**
  * A pile of cards facing down.
  */
-export const DrawPileMarker = ClosedFlag | 127
+export const DrawPileMarker: DrawPileMarker =
+  (ClosedFlag | 127) as DrawPileMarker
+
+export type DrawPileMarker = 383
 
 export function isPile(card: number): boolean {
   return card === DiscardPileMarker || card === DrawPileMarker
@@ -47,13 +52,21 @@ export function isPile(card: number): boolean {
  */
 export const SpreadMarker = 126
 
+export type SpreadMarker = 126
+
 /**
  * A fold of cards facing down/facing a player.
  */
-export const HandMarker = ClosedFlag | 126
+export const HandMarker: HandMarker = (ClosedFlag | 126) as HandMarker
+
+export type HandMarker = 382
 
 export function isFold(card: number): boolean {
   return card === SpreadMarker || card === HandMarker
+}
+
+export function isSet(card: number): boolean {
+  return isPile(card) || isFold(card)
 }
 
 /**
@@ -65,6 +78,8 @@ export function isFold(card: number): boolean {
  */
 export const DeckNumberMarker = 120
 
+export type DeckNumberMarker = 120
+
 /**
  * The card after this is from deck A.
  *
@@ -72,6 +87,8 @@ export const DeckNumberMarker = 120
  * is this marker, and the second byte is the card number.
  */
 export const DeckAMarker = 121
+
+export type DeckAMarker = 121
 
 /**
  * The card after this is from deck B.
@@ -81,6 +98,8 @@ export const DeckAMarker = 121
  */
 export const DeckBMarker = 122
 
+export type DeckBMarker = 122
+
 /**
  * The card after this is from deck C.
  *
@@ -88,6 +107,8 @@ export const DeckBMarker = 122
  * is this marker, and the second byte is the card number.
  */
 export const DeckCMarker = 123
+
+export type DeckCMarker = 123
 
 /**
  * The card after this is from deck D.
@@ -97,6 +118,8 @@ export const DeckCMarker = 123
  */
 export const DeckDMarker = 124
 
+export type DeckDMarker = 124
+
 /**
  * The card after this is from deck E.
  *
@@ -105,13 +128,17 @@ export const DeckDMarker = 124
  */
 export const DeckEMarker = 125
 
+export type DeckEMarker = 125
+
 /**
  * The card after this is from deck F.
  *
  * This is used for "two-byte" card representations, where the first byte
  * is this marker, and the second byte is the card number.
  */
-export const DeckFMarker = 120 | ClosedFlag
+export const DeckFMarker = (120 | ClosedFlag) as DeckFMarker
+
+export type DeckFMarker = 376
 
 /**
  * The card after this is from deck G.
@@ -119,7 +146,9 @@ export const DeckFMarker = 120 | ClosedFlag
  * This is used for "two-byte" card representations, where the first byte
  * is this marker, and the second byte is the card number.
  */
-export const DeckGMarker = 121 | ClosedFlag
+export const DeckGMarker = (121 | ClosedFlag) as DeckGMarker
+
+export type DeckGMarker = 377
 
 /**
  * The card after this is from deck H.
@@ -127,7 +156,9 @@ export const DeckGMarker = 121 | ClosedFlag
  * This is used for "two-byte" card representations, where the first byte
  * is this marker, and the second byte is the card number.
  */
-export const DeckHMarker = 122 | ClosedFlag
+export const DeckHMarker = (122 | ClosedFlag) as DeckHMarker
+
+export type DeckHMarker = 378
 
 /**
  * The card after this is from deck I.
@@ -135,7 +166,9 @@ export const DeckHMarker = 122 | ClosedFlag
  * This is used for "two-byte" card representations, where the first byte
  * is this marker, and the second byte is the card number.
  */
-export const DeckJMarker = 123 | ClosedFlag
+export const DeckJMarker = (123 | ClosedFlag) as DeckJMarker
+
+export type DeckJMarker = 379
 
 /**
  * The card after this is from deck K.
@@ -143,7 +176,9 @@ export const DeckJMarker = 123 | ClosedFlag
  * This is used for "two-byte" card representations, where the first byte
  * is this marker, and the second byte is the card number.
  */
-export const DeckKMarker = 124 | ClosedFlag
+export const DeckKMarker = (124 | ClosedFlag) as DeckKMarker
+
+export type DeckKMarker = 380
 
 /**
  * The card after this is from deck L.
@@ -151,7 +186,44 @@ export const DeckKMarker = 124 | ClosedFlag
  * This is used for "two-byte" card representations, where the first byte
  * is this marker, and the second byte is the card number.
  */
-export const DeckMMarker = 125 | ClosedFlag
+export const DeckMMarker = (125 | ClosedFlag) as DeckMMarker
+
+export type DeckMMarker = 381
+
+export type DeckMarker =
+  | DeckAMarker
+  | DeckBMarker
+  | DeckCMarker
+  | DeckDMarker
+  | DeckEMarker
+  | DeckFMarker
+  | DeckGMarker
+  | DeckHMarker
+  | DeckJMarker
+  | DeckKMarker
+  | DeckMMarker
+
+export const DeckMarkers: readonly DeckMarker[] = Object.freeze(
+  [
+    DeckAMarker,
+    DeckBMarker,
+    DeckCMarker,
+    DeckDMarker,
+    DeckEMarker,
+    DeckFMarker,
+    DeckGMarker,
+    DeckHMarker,
+    DeckJMarker,
+    DeckKMarker,
+    DeckMMarker,
+  ] as const,
+)
+
+export function isDeckMarker(
+  byte: number,
+): byte is DeckNumberMarker | DeckMarker {
+  return byte === DeckNumberMarker || DeckMarkers.includes(byte as DeckMarker)
+}
 
 //#endregion
 
