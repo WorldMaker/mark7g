@@ -166,10 +166,9 @@ export class CardSet {
     // header is {type}{primaryDeck} | {type}{decknumber}{primaryDeck} | {type}{highestDeckMarker}{primaryDeck}{...deckMarkers}
     const primaryIsDeckMarker = isDeckMarker(this.#deckMap.primaryId)
     const primaryOnlySize = primaryIsDeckMarker ? 3 : 2
-    const headerSize =
-      (this.#deckMap.markerIds.size > 0
-        ? 3 + this.#deckMap.markerIds.size
-        : primaryOnlySize)
+    const headerSize = this.#deckMap.markerIds.size > 0
+      ? 3 + this.#deckMap.markerIds.size
+      : primaryOnlySize
     this.#lastSize = headerSize +
       this.#cardState.reduce((sum, card) => sum + card.size(this.#deckMap!), 0)
     return this.#lastSize
@@ -201,7 +200,9 @@ export class CardSet {
     }
     const size = currentOffset - offset
     if (this.#lastSize !== undefined && size !== this.#lastSize) {
-      console.warn(`Serialized size mismatch: expected ${this.#lastSize}, was ${size}`)
+      console.warn(
+        `Serialized size mismatch: expected ${this.#lastSize}, was ${size}`,
+      )
     }
     return currentOffset - offset
   }

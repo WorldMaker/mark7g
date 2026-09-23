@@ -1,5 +1,18 @@
-import { DeckAMarker, DeckBMarker, DiscardPileMarker, DrawPileMarker, SpreadMarker } from './everdeck.ts'
-import { CardSet, CardState, deserialize, serialize, TableState, TableStore } from './table.ts'
+import {
+  DeckAMarker,
+  DeckBMarker,
+  DiscardPileMarker,
+  DrawPileMarker,
+  SpreadMarker,
+} from './everdeck.ts'
+import {
+  CardSet,
+  CardState,
+  deserialize,
+  serialize,
+  TableState,
+  TableStore,
+} from './table.ts'
 import { assertEquals } from '@std/assert'
 
 Deno.test('serialize a sample card set', () => {
@@ -104,8 +117,18 @@ Deno.test('serialize a sample table state', () => {
   const spread = new CardSet(SpreadMarker)
   spread.push(new CardState(0, 3))
   const tableState: TableState = {
-    decks: [{ type: 'everdeck', dealer: 'test', discard: 1, draw: 0, spread: 2, name: 'Test' }],
-    sets: [{ type: DrawPileMarker, name: 'Test Draw' }, { type: DiscardPileMarker, name: 'Test Discard' }, { type: SpreadMarker, name: 'Test' }],
+    decks: [{
+      type: 'everdeck',
+      dealer: 'test',
+      discard: 1,
+      draw: 0,
+      spread: 2,
+      name: 'Test',
+    }],
+    sets: [{ type: DrawPileMarker, name: 'Test Draw' }, {
+      type: DiscardPileMarker,
+      name: 'Test Discard',
+    }, { type: SpreadMarker, name: 'Test' }],
     state: [drawPile, discardPile, spread],
   }
   const tableStore = serialize(tableState)
@@ -125,8 +148,18 @@ Deno.test('serialize a sample table state', () => {
 
 Deno.test('deserialize a sample table state', () => {
   const tableStore: TableStore = {
-    decks: [{ type: 'everdeck', dealer: 'test', discard: 1, draw: 0, spread: 2, name: 'Test' }],
-    sets: [{ type: DrawPileMarker, name: 'Test Draw' }, { type: DiscardPileMarker, name: 'Test Discard' }, { type: SpreadMarker, name: 'Test' }],
+    decks: [{
+      type: 'everdeck',
+      dealer: 'test',
+      discard: 1,
+      draw: 0,
+      spread: 2,
+      name: 'Test',
+    }],
+    sets: [{ type: DrawPileMarker, name: 'Test Draw' }, {
+      type: DiscardPileMarker,
+      name: 'Test Discard',
+    }, { type: SpreadMarker, name: 'Test' }],
     state: new Uint8Array([
       DrawPileMarker,
       0,
