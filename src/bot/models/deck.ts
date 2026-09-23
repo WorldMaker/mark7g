@@ -1,0 +1,214 @@
+import {
+  everdeckAnimalEmoji,
+  everdeckCardEmoji,
+  everdeckLetterEmoji,
+  pcCardEmoji,
+  tarotCardEmoji,
+} from './everdeck.ts'
+
+export type HalfDeckType =
+  | 'pc52'
+  | 'pc53'
+  | 'pc54'
+  | 'pc55'
+  | 'pc56'
+  | 'pc57'
+  | 'pc58'
+  | 'pc59'
+  | 'pc60'
+
+export type DoubleDeckType =
+  | 'pc2x52'
+  | 'pc2x53'
+  | 'pc2x54'
+  | 'pc2x55'
+  | 'pc2x56'
+  | 'pc2x57'
+  | 'pc2x58'
+  | 'pc2x59'
+  | 'pc2x60'
+
+export type FullDeckType =
+  | 'everdeck'
+  | 'tarot'
+  | 'letter'
+  | 'animal'
+  | DoubleDeckType
+
+export type DeckType = HalfDeckType | FullDeckType
+
+export function isHalfDeck(deckType: DeckType): deckType is HalfDeckType {
+  return deckType.startsWith('pc') && !deckType.startsWith('pc2x')
+}
+
+export interface HalfDeckDescription {
+  type: HalfDeckType
+  loName: string
+  loDealer: string
+  loDraw: number | null
+  loDiscard: number | null
+  loSpread: number | null
+  hiName: string
+  hiDealer: string
+  hiDraw: number | null
+  hiDiscard: number | null
+  hiSpread: number | null
+}
+
+export interface FullDeckDescription {
+  type: FullDeckType
+  name: string
+  dealer: string
+  draw: number | null
+  discard: number | null
+  spread: number | null
+}
+
+export type DeckDescription = HalfDeckDescription | FullDeckDescription
+
+export interface DeckBuilder {
+  type: DeckType
+  name: string
+  description: string
+  display(card: number): string
+  generate(high?: boolean): Iterable<number>
+}
+
+export type DeckBuilders = Readonly<Record<DeckType, DeckBuilder>>
+
+function* range(start: number, end: number): Iterable<number> {
+  for (let i = start; i < end; i++) {
+    yield i
+  }
+}
+
+// a sort of hilbert curve to mix up the suits/"values"
+const loJokers = [0, 30, 21, 11, 20, 10, 31, 1]
+
+function* generateLoDeck(jokers: number): Iterable<number> {
+  // clubs
+  yield* range(2, 10)
+  yield* range(80, 85)
+  // spades
+  yield* range(12, 20)
+  yield* range(85, 90)
+  // hearts
+  yield* range(22, 30)
+  yield* range(90, 95)
+  // diamonds
+  yield* range(32, 40)
+  yield* range(95, 100)
+  // jokers
+  for (let i = 0; i < jokers; i++) {
+    yield loJokers[i]
+  }
+}
+
+const hiJokers = [40, 70, 61, 51, 60, 50, 71, 41]
+
+function* generateHiDeck(jokers: number): Iterable<number> {
+  // clubs
+  yield* range(42, 50)
+  yield* range(100, 105)
+  // spades
+  yield* range(52, 60)
+  yield* range(105, 110)
+  // hearts
+  yield* range(62, 70)
+  yield* range(110, 115)
+  // diamonds
+  yield* range(72, 80)
+  yield* range(115, 120)
+  // jokers
+  for (let i = 0; i < jokers; i++) {
+    yield hiJokers[i]
+  }
+}
+
+function* generate2xDeck(jokers: number): Iterable<number> {
+  yield* generateLoDeck(jokers)
+  yield* generateHiDeck(jokers)
+}
+
+function* generateTarotDeck(): Iterable<number> {
+  // clubs and spades form the major arcana
+  // clubs
+  yield* range(0, 10)
+  yield 84 // ace
+  // spades
+  yield* range(10, 20)
+  yield 89 // ace
+  // hearts
+  yield* range(20, 30)
+  yield* range(90, 95)
+  // diamonds
+  yield* range(30, 40)
+  yield* range(95, 100)
+  // moons
+  yield* range(60, 70)
+  yield* range(110, 115)
+  // stars
+  yield* range(70, 80)
+  yield* range(115, 120)
+}
+
+function* generatePcDeckBuilders(): Iterable<DeckBuilder> {
+  for (let i = 52; i <= 60; i++) {
+    const deckType = `pc${i}` as DeckType
+    const deckJokers = i - 52
+    yield {
+      type: deckType,
+      name: `Playing Card Deck (${deckJokers} jokers)`,
+      description: 'A standard 52-card playing deck',
+      display: pcCardEmoji,
+      generate: (high: boolean) =>
+        high ? generateHiDeck(deckJokers) : generateLoDeck(deckJokers),
+    }
+    const doubleDeckType = `pc2x${i}` as DeckType
+    yield {
+      type: doubleDeckType,
+      name: `Double Playing Card Deck (${deckJokers} jokers)`,
+      description: 'A standard 52-card playing deck, doubled',
+      display: pcCardEmoji,
+      generate: () => generate2xDeck(deckJokers),
+    }
+  }
+}
+
+const pcDeckBuilders = Object.fromEntries(
+  Array.from(generatePcDeckBuilders())
+    .map((builder) => [builder.type, builder]),
+) as Record<HalfDeckType | DoubleDeckType, DeckBuilder>
+
+export const deckBuilders: DeckBuilders = Object.freeze({
+  ...pcDeckBuilders,
+  everdeck: {
+    type: 'everdeck',
+    name: 'Everdeck',
+    description: 'A complex deck of eight suits and 120 total cards',
+    display: everdeckCardEmoji,
+    generate: () => range(0, 120),
+  },
+  letter: {
+    type: 'letter',
+    name: 'Letter Deck',
+    description:
+      'A deck consisting of letters with points in roughly English distribution',
+    display: everdeckLetterEmoji,
+    generate: () => range(0, 120),
+  },
+  animal: {
+    type: 'animal',
+    name: 'Animal Deck',
+    description: 'A deck consisting pairs of various animals',
+    display: everdeckAnimalEmoji,
+    generate: () => range(0, 120),
+  },
+  tarot: {
+    type: 'tarot',
+    name: 'Tarot Deck',
+    description: 'A traditional tarot deck with 78 cards',
+    display: tarotCardEmoji,
+    generate: generateTarotDeck,
+  },
+})

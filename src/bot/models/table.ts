@@ -264,11 +264,5 @@ export interface SetDescription {
 }
 
 export interface HandDescription extends SetDescription {
-  readonly user: string
-}
-
-export interface DeckDescription {
-  readonly name: string
-  readonly user: string
-  readonly dealer: boolean
+  readonly player: string
 }
