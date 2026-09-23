@@ -1,3 +1,4 @@
+import { DeckDescription } from './deck.ts'
 import {
   DeckMarker,
   DeckMarkers,
@@ -162,10 +163,10 @@ export class CardSet {
     this.#deckMap ??= this.#buildDeckMap()
     // header is {type}{primaryDeck} | {type}{decknumber}{primaryDeck} | {type}{highestDeckMarker}{primaryDeck}{...deckMarkers}
     const primaryIsDeckMarker = isDeckMarker(this.#deckMap.primaryId)
-    const primaryOnlySize = primaryIsDeckMarker ? 2 : 1
-    const headerSize = 2 +
+    const primaryOnlySize = primaryIsDeckMarker ? 3 : 2
+    const headerSize =
       (this.#deckMap.markerIds.size > 0
-        ? this.#deckMap.markerIds.size + 1
+        ? 3 + this.#deckMap.markerIds.size
         : primaryOnlySize)
     return headerSize +
       this.#cardState.reduce((sum, card) => sum + card.size(this.#deckMap!), 0)
@@ -259,10 +260,62 @@ export class CardSet {
   }
 }
 
-export interface SetDescription {
-  readonly name: string
+export interface SimpleSetDescription {
+  type: DrawPileMarker | DiscardPileMarker | SpreadMarker
+  name: string
 }
 
-export interface HandDescription extends SetDescription {
-  readonly player: string
+export interface HandDescription {
+  type: HandMarker
+  name: string
+  player: string
+}
+
+export type SetDescription = SimpleSetDescription | HandDescription
+
+export interface TableDescription {
+  decks: DeckDescription[]
+  sets: SetDescription[]
+}
+
+export interface TableStore extends TableDescription {
+  state: Uint8Array
+}
+
+export interface TableState extends TableDescription {
+  state: CardSet[]
+}
+
+export function serialize(table: TableState): TableStore {
+  const size = table.state.reduce((acc, set) => acc + set.size(), 0)
+  const buffer = new Uint8Array(size)
+  let offset = 0
+  for (const set of table.state) {
+    offset += set.serialize(buffer, offset)
+  }
+  return {
+    ...table,
+    state: buffer,
+  }
+}
+
+export function deserialize(table: TableStore): TableState {
+  const state: CardSet[] = []
+  let offset = 0
+  while (offset < table.state.length) {
+    const marker = table.state[offset]
+    if (!isSet(marker)) {
+      throw new Error(`Unexpected marker at offset ${offset}: ${marker}`)
+    }
+    if (marker !== table.sets[state.length].type) {
+      throw new Error(`Unexpected set type at offset ${offset}: ${marker}`)
+    }
+    const set = new CardSet(marker)
+    offset += set.deserialize(table.state, offset)
+    state.push(set)
+  }
+  return {
+    ...table,
+    state,
+  }
 }

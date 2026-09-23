@@ -43,7 +43,9 @@ export const DrawPileMarker: DrawPileMarker =
 
 export type DrawPileMarker = 255
 
-export function isPile(card: number): boolean {
+export function isPile(
+  card: number,
+): card is DiscardPileMarker | DrawPileMarker {
   return card === DiscardPileMarker || card === DrawPileMarker
 }
 
@@ -61,11 +63,13 @@ export const HandMarker: HandMarker = (ClosedFlag | 126) as HandMarker
 
 export type HandMarker = 254
 
-export function isFold(card: number): boolean {
+export function isFold(card: number): card is SpreadMarker | HandMarker {
   return card === SpreadMarker || card === HandMarker
 }
 
-export function isSet(card: number): boolean {
+export function isSet(
+  card: number,
+): card is DiscardPileMarker | DrawPileMarker | SpreadMarker | HandMarker {
   return isPile(card) || isFold(card)
 }
 
