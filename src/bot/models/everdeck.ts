@@ -41,7 +41,7 @@ export type DiscardPileMarker = 127
 export const DrawPileMarker: DrawPileMarker =
   (ClosedFlag | 127) as DrawPileMarker
 
-export type DrawPileMarker = 383
+export type DrawPileMarker = 255
 
 export function isPile(card: number): boolean {
   return card === DiscardPileMarker || card === DrawPileMarker
@@ -59,7 +59,7 @@ export type SpreadMarker = 126
  */
 export const HandMarker: HandMarker = (ClosedFlag | 126) as HandMarker
 
-export type HandMarker = 382
+export type HandMarker = 254
 
 export function isFold(card: number): boolean {
   return card === SpreadMarker || card === HandMarker
@@ -138,7 +138,7 @@ export type DeckEMarker = 125
  */
 export const DeckFMarker = (120 | ClosedFlag) as DeckFMarker
 
-export type DeckFMarker = 376
+export type DeckFMarker = 248
 
 /**
  * The card after this is from deck G.
@@ -148,7 +148,7 @@ export type DeckFMarker = 376
  */
 export const DeckGMarker = (121 | ClosedFlag) as DeckGMarker
 
-export type DeckGMarker = 377
+export type DeckGMarker = 249
 
 /**
  * The card after this is from deck H.
@@ -158,7 +158,7 @@ export type DeckGMarker = 377
  */
 export const DeckHMarker = (122 | ClosedFlag) as DeckHMarker
 
-export type DeckHMarker = 378
+export type DeckHMarker = 250
 
 /**
  * The card after this is from deck I.
@@ -168,7 +168,7 @@ export type DeckHMarker = 378
  */
 export const DeckJMarker = (123 | ClosedFlag) as DeckJMarker
 
-export type DeckJMarker = 379
+export type DeckJMarker = 251
 
 /**
  * The card after this is from deck K.
@@ -178,7 +178,7 @@ export type DeckJMarker = 379
  */
 export const DeckKMarker = (124 | ClosedFlag) as DeckKMarker
 
-export type DeckKMarker = 380
+export type DeckKMarker = 252
 
 /**
  * The card after this is from deck L.
@@ -188,7 +188,7 @@ export type DeckKMarker = 380
  */
 export const DeckMMarker = (125 | ClosedFlag) as DeckMMarker
 
-export type DeckMMarker = 381
+export type DeckMMarker = 253
 
 export type DeckMarker =
   | DeckAMarker
