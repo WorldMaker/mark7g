@@ -159,6 +159,8 @@ export class CardSet {
     return { primaryId, secondaryIds, markerIds }
   }
 
+  #lastSize?: number
+
   size(): number {
     this.#deckMap ??= this.#buildDeckMap()
     // header is {type}{primaryDeck} | {type}{decknumber}{primaryDeck} | {type}{highestDeckMarker}{primaryDeck}{...deckMarkers}
@@ -168,8 +170,9 @@ export class CardSet {
       (this.#deckMap.markerIds.size > 0
         ? 3 + this.#deckMap.markerIds.size
         : primaryOnlySize)
-    return headerSize +
+    this.#lastSize = headerSize +
       this.#cardState.reduce((sum, card) => sum + card.size(this.#deckMap!), 0)
+    return this.#lastSize
   }
 
   serialize(buffer: Uint8Array, offset: number): number {
@@ -195,6 +198,10 @@ export class CardSet {
     // Serialize cards
     for (const card of this.#cardState) {
       currentOffset += card.serialize(this.#deckMap, buffer, currentOffset)
+    }
+    const size = currentOffset - offset
+    if (this.#lastSize !== undefined && size !== this.#lastSize) {
+      console.warn(`Serialized size mismatch: expected ${this.#lastSize}, was ${size}`)
     }
     return currentOffset - offset
   }
