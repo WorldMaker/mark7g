@@ -271,6 +271,7 @@ export class CardSet {
 export interface SimpleSetDescription {
   type: DrawPileMarker | DiscardPileMarker | SpreadMarker
   name: string
+  dealer?: boolean
 }
 
 export interface HandDescription {
