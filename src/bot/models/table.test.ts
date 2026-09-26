@@ -233,7 +233,11 @@ Deno.test('deserialize a sample table state with an empty set', () => {
       spread: 2,
       name: 'Test',
     }],
-    sets: [{ type: DrawPileMarker, name: 'Test Draw' }, { type: HandMarker, name: 'Test Hand', player: 'test' }, {
+    sets: [{ type: DrawPileMarker, name: 'Test Draw' }, {
+      type: HandMarker,
+      name: 'Test Hand',
+      player: 'test',
+    }, {
       type: DiscardPileMarker,
       name: 'Test Discard',
     }, { type: SpreadMarker, name: 'Test' }],
