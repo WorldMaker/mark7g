@@ -3,6 +3,7 @@ import {
   DeckBMarker,
   DiscardPileMarker,
   DrawPileMarker,
+  HandMarker,
   SpreadMarker,
 } from './everdeck.ts'
 import {
@@ -14,6 +15,24 @@ import {
   TableStore,
 } from './table.ts'
 import { assertEquals } from '@std/assert'
+
+Deno.test('serialize an empty card set', () => {
+  const emptySet = new CardSet(DrawPileMarker)
+  const size = emptySet.size()
+  assertEquals(size, 1)
+  const buffer = new Uint8Array(size)
+  const bytesWritten = emptySet.serialize(buffer, 0)
+  assertEquals(bytesWritten, size)
+  assertEquals(buffer[0], DrawPileMarker)
+})
+
+Deno.test('deserialize an empty card set', () => {
+  const emptySet = new CardSet(DrawPileMarker)
+  const buffer = new Uint8Array([DrawPileMarker])
+  const bytesRead = emptySet.deserialize(buffer, 0)
+  assertEquals(bytesRead, 1)
+  assertEquals(emptySet.length, 0)
+})
 
 Deno.test('serialize a sample card set', () => {
   const sampleSet = new CardSet(DrawPileMarker)
@@ -83,10 +102,23 @@ Deno.test('deserialize a sample card set', () => {
   assertEquals(deckMap.secondaryIds.get(2), DeckBMarker)
   assertEquals(deckMap.markerIds.get(DeckAMarker), 1)
   assertEquals(deckMap.markerIds.get(DeckBMarker), 2)
+  assertEquals(sampleSet.at(0)?.deckId, 0)
+  assertEquals(sampleSet.at(0)?.cardId, 1)
+  assertEquals(sampleSet.at(1)?.deckId, 0)
+  assertEquals(sampleSet.at(1)?.cardId, 2)
+  assertEquals(sampleSet.at(2)?.deckId, 0)
+  assertEquals(sampleSet.at(2)?.cardId, 3)
+  assertEquals(sampleSet.at(3)?.deckId, 1)
+  assertEquals(sampleSet.at(3)?.cardId, 1)
+  assertEquals(sampleSet.at(4)?.deckId, 1)
+  assertEquals(sampleSet.at(4)?.cardId, 2)
+  assertEquals(sampleSet.at(5)?.deckId, 2)
+  assertEquals(sampleSet.at(5)?.cardId, 1)
 })
 
 Deno.test('serialize an empty table state', () => {
   const tableState = {
+    id: 'test',
     decks: [],
     sets: [],
     state: [],
@@ -99,6 +131,7 @@ Deno.test('serialize an empty table state', () => {
 
 Deno.test('deserialize an empty table state', () => {
   const tableStore = {
+    id: 'test',
     decks: [],
     sets: [],
     state: new Uint8Array(0),
@@ -117,6 +150,7 @@ Deno.test('serialize a sample table state', () => {
   const spread = new CardSet(SpreadMarker)
   spread.push(new CardState(0, 3))
   const tableState: TableState = {
+    id: 'test',
     decks: [{
       type: 'everdeck',
       dealer: 'test',
@@ -148,6 +182,7 @@ Deno.test('serialize a sample table state', () => {
 
 Deno.test('deserialize a sample table state', () => {
   const tableStore: TableStore = {
+    id: 'test',
     decks: [{
       type: 'everdeck',
       dealer: 'test',
@@ -185,4 +220,48 @@ Deno.test('deserialize a sample table state', () => {
   assertEquals(tableState.state[2].length, 1)
   assertEquals(tableState.state[2].at(0)?.deckId, 0)
   assertEquals(tableState.state[2].at(0)?.cardId, 3)
+})
+
+Deno.test('deserialize a sample table state with an empty set', () => {
+  const tableStore: TableStore = {
+    id: 'test',
+    decks: [{
+      type: 'everdeck',
+      dealer: 'test',
+      discard: 1,
+      draw: 0,
+      spread: 2,
+      name: 'Test',
+    }],
+    sets: [{ type: DrawPileMarker, name: 'Test Draw' }, { type: HandMarker, name: 'Test Hand', player: 'test' }, {
+      type: DiscardPileMarker,
+      name: 'Test Discard',
+    }, { type: SpreadMarker, name: 'Test' }],
+    state: new Uint8Array([
+      DrawPileMarker,
+      0,
+      1,
+      HandMarker,
+      DiscardPileMarker,
+      0,
+      2,
+      SpreadMarker,
+      0,
+      3,
+    ]),
+  }
+  const tableState = deserialize(tableStore)
+  assertEquals(tableState.decks, tableStore.decks)
+  assertEquals(tableState.sets, tableStore.sets)
+  assertEquals(tableState.state.length, 4)
+  assertEquals(tableState.state[0].length, 1)
+  assertEquals(tableState.state[0].at(0)?.deckId, 0)
+  assertEquals(tableState.state[0].at(0)?.cardId, 1)
+  assertEquals(tableState.state[1].length, 0)
+  assertEquals(tableState.state[2].length, 1)
+  assertEquals(tableState.state[2].at(0)?.deckId, 0)
+  assertEquals(tableState.state[2].at(0)?.cardId, 2)
+  assertEquals(tableState.state[3].length, 1)
+  assertEquals(tableState.state[3].at(0)?.deckId, 0)
+  assertEquals(tableState.state[3].at(0)?.cardId, 3)
 })

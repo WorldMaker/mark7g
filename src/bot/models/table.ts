@@ -11,6 +11,8 @@ import {
   SpreadMarker,
 } from './everdeck.ts'
 
+const TableExpiration = 2 /* hr */ * 60 /* min */ * 60 /* sec */ * 1000 /* ms */
+
 export class CardState {
   #deckId: number
   #cardId: number
@@ -162,6 +164,10 @@ export class CardSet {
   #lastSize?: number
 
   size(): number {
+    if (this.#cardState.length === 0) {
+      this.#lastSize = 1
+      return this.#lastSize
+    }
     this.#deckMap ??= this.#buildDeckMap()
     // header is {type}{primaryDeck} | {type}{decknumber}{primaryDeck} | {type}{highestDeckMarker}{primaryDeck}{...deckMarkers}
     const primaryIsDeckMarker = isDeckMarker(this.#deckMap.primaryId)
@@ -175,6 +181,15 @@ export class CardSet {
   }
 
   serialize(buffer: Uint8Array, offset: number): number {
+    if (this.#cardState.length === 0) {
+      buffer[offset] = this.#type
+      if (this.#lastSize !== undefined && this.#lastSize !== 1) {
+        console.warn(
+          `Serialized size mismatch: expected ${this.#lastSize}, was 1`,
+        )
+      }
+      return 1
+    }
     this.#deckMap ??= this.#buildDeckMap()
     let currentOffset = offset
     // Serialize header/deck map
@@ -210,10 +225,11 @@ export class CardSet {
   deserialize(buffer: Uint8Array, offset: number, length?: number): number {
     let currentOffset = offset
     // Safety check that types match
-    const type = buffer[currentOffset++]
+    const type = buffer[currentOffset]
     if (type !== this.#type) {
       throw new Error(`Type mismatch: expected ${this.#type}, got ${type}`)
     }
+    currentOffset++
     // Deserialize header/deck map
     this.#deckMap = {
       primaryId: 0,
@@ -222,27 +238,42 @@ export class CardSet {
     }
     this.#deckCounts = new Map()
     this.#cardState = []
-    const firstByte = buffer[currentOffset++]
+    const endOffset = offset + (length ?? (buffer.length - offset))
+    if (currentOffset >= buffer.length) {
+      return currentOffset - offset
+    }
+    const firstByte = buffer[currentOffset]
+    if (isSet(firstByte)) {
+      if (length !== undefined && currentOffset < endOffset) {
+        console.warn(
+          `Unexpected set marker at offset ${currentOffset} before end of specified length.`,
+        )
+      }
+      return currentOffset - offset
+    }
     if (!isDeckMarker(firstByte)) {
       this.#deckMap.primaryId = firstByte
     } else if (firstByte === DeckNumberMarker) {
-      this.#deckMap.primaryId = buffer[currentOffset++]
+      currentOffset++
+      this.#deckMap.primaryId = buffer[currentOffset]
     } else {
       const highestDeckMarker = firstByte
-      this.#deckMap.primaryId = buffer[currentOffset++]
+      currentOffset++
+      this.#deckMap.primaryId = buffer[currentOffset]
       for (
         const marker of DeckMarkers.slice(
           0,
           DeckMarkers.indexOf(highestDeckMarker) + 1,
         )
       ) {
-        const deckId = buffer[currentOffset++]
+        currentOffset++
+        const deckId = buffer[currentOffset]
         this.#deckMap.markerIds.set(marker, deckId)
         this.#deckMap.secondaryIds.set(deckId, marker)
       }
     }
+    currentOffset++
     // Deserialize cards
-    const endOffset = offset + (length ?? (buffer.length - offset))
     while (currentOffset < endOffset) {
       if (isSet(buffer[currentOffset])) {
         if (length !== undefined && currentOffset < endOffset) {
@@ -283,6 +314,7 @@ export interface HandDescription {
 export type SetDescription = SimpleSetDescription | HandDescription
 
 export interface TableDescription {
+  id: string
   decks: DeckDescription[]
   sets: SetDescription[]
 }
@@ -327,4 +359,12 @@ export function deserialize(table: TableStore): TableState {
     ...table,
     state,
   }
+}
+
+export function getTable(kv: Deno.Kv, tableId: string) {
+  return kv.get<TableStore>(['tables', tableId])
+}
+
+export function updateTable(kv: Deno.Kv, table: TableStore) {
+  return kv.set(['tables', table.id], table, { expireIn: TableExpiration })
 }
