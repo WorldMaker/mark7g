@@ -365,6 +365,12 @@ export function getTable(kv: Deno.Kv, tableId: string) {
   return kv.get<TableStore>(['tables', tableId])
 }
 
-export function updateTable(kv: Deno.Kv, table: TableStore) {
+export function updateTable(kv: Deno.Kv, table: TableStore, versionstamp?: string) {
+  if (versionstamp) {
+    return kv.atomic()
+      .check({ key: ['tables', table.id], versionstamp })
+      .set(['tables', table.id], table, { expireIn: TableExpiration })
+      .commit()
+  }
   return kv.set(['tables', table.id], table, { expireIn: TableExpiration })
 }
