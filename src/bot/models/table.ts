@@ -362,15 +362,19 @@ export function deserialize(table: TableStore): TableState {
 }
 
 export function getTable(kv: Deno.Kv, tableId: string) {
-  return kv.get<TableStore>(['tables', tableId])
+  return kv.get<TableStore>(['table', tableId])
 }
 
-export function updateTable(kv: Deno.Kv, table: TableStore, versionstamp?: string) {
+export function updateTable(
+  kv: Deno.Kv,
+  table: TableStore,
+  versionstamp?: string,
+) {
   if (versionstamp) {
     return kv.atomic()
-      .check({ key: ['tables', table.id], versionstamp })
-      .set(['tables', table.id], table, { expireIn: TableExpiration })
+      .check({ key: ['table', table.id], versionstamp })
+      .set(['table', table.id], table, { expireIn: TableExpiration })
       .commit()
   }
-  return kv.set(['tables', table.id], table, { expireIn: TableExpiration })
+  return kv.set(['table', table.id], table, { expireIn: TableExpiration })
 }
