@@ -41,22 +41,7 @@ export function isHalfDeck(deckType: DeckType): deckType is HalfDeckType {
   return deckType.startsWith('pc') && !deckType.startsWith('pc2x')
 }
 
-export interface HalfDeckDescription {
-  type: HalfDeckType
-  loName: string
-  loDealer: string
-  loDraw: number | null
-  loDiscard: number | null
-  loSpread: number | null
-  hiName: string
-  hiDealer: string
-  hiDraw: number | null
-  hiDiscard: number | null
-  hiSpread: number | null
-}
-
-export interface FullDeckDescription {
-  type: FullDeckType
+export interface DeckInfo {
   name: string
   dealer: string
   draw: number | null
@@ -64,7 +49,46 @@ export interface FullDeckDescription {
   spread: number | null
 }
 
-export type DeckDescription = HalfDeckDescription | FullDeckDescription
+export interface LowHalfDeckDescription {
+  type: [HalfDeckType]
+  low: DeckInfo
+}
+
+export function isLowHalfDeckDescription(
+  deck: DeckDescription,
+): deck is LowHalfDeckDescription {
+  return Array.isArray(deck.type) && deck.type.length === 1
+}
+
+export interface HighHalfDeckDescription {
+  type: [HalfDeckType, HalfDeckType]
+  low: DeckInfo
+  high: DeckInfo
+}
+
+export function isHighHalfDeckDescription(
+  deck: DeckDescription,
+): deck is HighHalfDeckDescription {
+  return Array.isArray(deck.type) && deck.type.length === 2
+}
+
+export type HalfDeckDescription =
+  | LowHalfDeckDescription
+  | HighHalfDeckDescription
+
+export interface FullDeckDescription extends DeckInfo {
+  type: FullDeckType
+}
+
+export function isFullDeckDescription(
+  deck: DeckDescription,
+): deck is FullDeckDescription {
+  return typeof deck.type === 'string'
+}
+
+export type DeckDescription =
+  | HalfDeckDescription
+  | FullDeckDescription
 
 export interface DeckBuilder {
   type: DeckType
