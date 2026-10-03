@@ -384,7 +384,7 @@ export function getTable(kv: Deno.Kv, tableId: string) {
 export function updateTable(
   kv: Deno.Kv,
   table: TableStore,
-  versionstamp?: string,
+  versionstamp?: string | null,
 ) {
   if (versionstamp) {
     return kv.atomic()

@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "dev": "deno run --watch --allow-net main.ts"
+    "dev": "deno run --watch --allow-env --env-file --allow-net --unstable-kv main.ts"
   },
   "imports": {
     "@buape/carbon": "npm:@buape/carbon@^0.16.0",

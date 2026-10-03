@@ -11,3 +11,5 @@ coverage/
 *.lcov
 
 dist/
+
+.env

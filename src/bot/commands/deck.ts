@@ -8,6 +8,8 @@ import {
   isLowHalfDeckDescription,
 } from '../models/deck.ts'
 import { DrawPileMarker } from '../models/everdeck.ts'
+import { TableTransactionCommand } from './table-tx.ts'
+import { type CommandInteraction, MessagePayload } from '@buape/carbon'
 
 export function getNextDeckId(
   table: TableState,
@@ -122,5 +124,47 @@ export function placeDeck(
       ...info,
       type: type,
     }
+  }
+}
+
+export class DeckCommand extends TableTransactionCommand {
+  name = 'deck'
+  override description = 'Place a deck on the table'
+
+  override options = [
+    {
+      name: 'type',
+      description: 'The type of deck to place',
+      type: 3, // ApplicationCommandOptionType.String,
+      required: true,
+      choices: Object.entries(deckBuilders).map(([key, value]) => ({
+        name: value.name,
+        value: key,
+      })),
+    },
+    {
+      name: 'name',
+      description: 'The name of the deck',
+      type: 3, // ApplicationCommandOptionType.String,
+      required: true,
+    },
+  ]
+
+  override async preCheck(interaction: CommandInteraction): Promise<boolean> {
+    return (await super.preCheck(interaction)) && interaction.user !== null
+  }
+
+  override updateTable(
+    interaction: CommandInteraction,
+    state: TableState,
+  ): Promise<MessagePayload> {
+    const dealer = interaction.user!.id
+    const type = interaction.options.getString('type', true) as DeckType
+    const name = interaction.options.getString('name', true)
+    placeDeck(state, dealer, type, name)
+    // TODO: Table display
+    return Promise.resolve(
+      `Placed deck "${name}" of type "${type}" on the table.`,
+    )
   }
 }
