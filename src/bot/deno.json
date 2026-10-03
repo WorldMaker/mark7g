@@ -3,6 +3,7 @@
     "dev": "deno run --watch --allow-net main.ts"
   },
   "imports": {
+    "@buape/carbon": "npm:@buape/carbon@^0.16.0",
     "@std/assert": "jsr:@std/assert@1"
   },
   "fmt": {
