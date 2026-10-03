@@ -43,7 +43,7 @@ export function isHalfDeck(deckType: DeckType): deckType is HalfDeckType {
 
 export interface DeckInfo {
   name: string
-  dealer: string
+  dealer: string | null
   draw: number | null
   discard: number | null
   spread: number | null
@@ -95,12 +95,12 @@ export interface DeckBuilder {
   name: string
   description: string
   display(card: number): string
-  generate(high?: boolean): Iterable<number>
+  generate(high?: boolean): IteratorObject<number>
 }
 
 export type DeckBuilders = Readonly<Record<DeckType, DeckBuilder>>
 
-function* range(start: number, end: number): Iterable<number> {
+function* range(start: number, end: number) {
   for (let i = start; i < end; i++) {
     yield i
   }
@@ -109,7 +109,7 @@ function* range(start: number, end: number): Iterable<number> {
 // a sort of hilbert curve to mix up the suits/"values"
 const loJokers = [0, 30, 21, 11, 20, 10, 31, 1]
 
-function* generateLoDeck(jokers: number): Iterable<number> {
+function* generateLoDeck(jokers: number) {
   // clubs
   yield* range(2, 10)
   yield* range(80, 85)
@@ -130,7 +130,7 @@ function* generateLoDeck(jokers: number): Iterable<number> {
 
 const hiJokers = [40, 70, 61, 51, 60, 50, 71, 41]
 
-function* generateHiDeck(jokers: number): Iterable<number> {
+function* generateHiDeck(jokers: number) {
   // clubs
   yield* range(42, 50)
   yield* range(100, 105)
@@ -149,12 +149,16 @@ function* generateHiDeck(jokers: number): Iterable<number> {
   }
 }
 
-function* generate2xDeck(jokers: number): Iterable<number> {
+export function isHighDeckCard(card: number): boolean {
+  return (card >= 40 && card < 80) || (card >= 100 && card < 120)
+}
+
+function* generate2xDeck(jokers: number) {
   yield* generateLoDeck(jokers)
   yield* generateHiDeck(jokers)
 }
 
-function* generateTarotDeck(): Iterable<number> {
+function* generateTarotDeck() {
   // clubs and spades form the major arcana
   // clubs
   yield* range(0, 10)
