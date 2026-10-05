@@ -1,5 +1,6 @@
 import { Client } from '@buape/carbon'
 import { createHandler } from '@buape/carbon/adapters/fetch'
+import { DeckCommand } from './commands/deck.ts'
 
 const BaseUrl = Deno.env.get('BASE_URL')
 const DeploySecret = Deno.env.get('DEPLOY_SECRET')
@@ -15,7 +16,7 @@ const client = new Client({
   publicKey: PublicKey!,
   token: Token!,
   devGuilds,
-}, { commands: [] })
+}, { commands: [new DeckCommand()] })
 
 if (import.meta.main) {
   const handler = createHandler(client)

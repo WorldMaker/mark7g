@@ -2,6 +2,7 @@ import {
   everdeckAnimalEmoji,
   everdeckCardEmoji,
   everdeckLetterEmoji,
+  everdeckWord,
   pcCardEmoji,
   tarotCardEmoji,
 } from './everdeck.ts'
@@ -223,6 +224,13 @@ export const deckBuilders: DeckBuilders = Object.freeze({
     description:
       'A deck consisting of letters with points in roughly English distribution',
     display: everdeckLetterEmoji,
+    generate: () => range(0, 120),
+  },
+  word: {
+    type: 'word',
+    name: 'Word Deck',
+    description: 'A deck consisting of words',
+    display: everdeckWord,
     generate: () => range(0, 120),
   },
   animal: {
