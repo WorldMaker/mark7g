@@ -113,6 +113,21 @@ export class CardSet {
     this.#deckCounts.set(deckId, (this.#deckCounts.get(deckId) ?? 0) + 1)
   }
 
+  pop() {
+    const cardState = this.#cardState.pop()
+    if (cardState) {
+      const deckId = cardState.deckId
+      const count = this.#deckCounts.get(deckId) ?? 0
+      if (count > 1) {
+        this.#deckCounts.set(deckId, count - 1)
+      } else {
+        this.#deckCounts.delete(deckId)
+      }
+      this.#deckMap = undefined
+    }
+    return cardState
+  }
+
   remove(cardState: CardState) {
     this.#deckMap = undefined
     const index = this.#cardState.indexOf(cardState)
@@ -135,7 +150,7 @@ export class CardSet {
       ;[array[i], array[j]] = [array[j], array[i]]
     }
     for (const card of array) {
-      this.#cardState.push(card)
+      this.#cardState.unshift(card)
       this.#deckCounts.set(
         card.deckId,
         (this.#deckCounts.get(card.deckId) ?? 0) + 1,
@@ -145,7 +160,7 @@ export class CardSet {
   }
 
   at(index: number): CardState | undefined {
-    return this.#cardState[index]
+    return this.#cardState.at(index)
   }
 
   [Symbol.iterator](): Iterator<CardState> {
