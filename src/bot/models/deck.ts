@@ -2,6 +2,7 @@ import {
   everdeckAnimalEmoji,
   everdeckCardEmoji,
   everdeckLetterEmoji,
+  everdeckWord,
   pcCardEmoji,
   tarotCardEmoji,
 } from './everdeck.ts'
@@ -41,42 +42,66 @@ export function isHalfDeck(deckType: DeckType): deckType is HalfDeckType {
   return deckType.startsWith('pc') && !deckType.startsWith('pc2x')
 }
 
-export interface HalfDeckDescription {
-  type: HalfDeckType
-  loName: string
-  loDealer: string
-  loDraw: number | null
-  loDiscard: number | null
-  loSpread: number | null
-  hiName: string
-  hiDealer: string
-  hiDraw: number | null
-  hiDiscard: number | null
-  hiSpread: number | null
-}
-
-export interface FullDeckDescription {
-  type: FullDeckType
+export interface DeckInfo {
   name: string
-  dealer: string
+  dealer: string | null
   draw: number | null
   discard: number | null
   spread: number | null
 }
 
-export type DeckDescription = HalfDeckDescription | FullDeckDescription
+export interface LowHalfDeckDescription {
+  type: [HalfDeckType]
+  low: DeckInfo
+}
+
+export function isLowHalfDeckDescription(
+  deck: DeckDescription,
+): deck is LowHalfDeckDescription {
+  return Array.isArray(deck.type) && deck.type.length === 1
+}
+
+export interface HighHalfDeckDescription {
+  type: [HalfDeckType, HalfDeckType]
+  low: DeckInfo
+  high: DeckInfo
+}
+
+export function isHighHalfDeckDescription(
+  deck: DeckDescription,
+): deck is HighHalfDeckDescription {
+  return Array.isArray(deck.type) && deck.type.length === 2
+}
+
+export type HalfDeckDescription =
+  | LowHalfDeckDescription
+  | HighHalfDeckDescription
+
+export interface FullDeckDescription extends DeckInfo {
+  type: FullDeckType
+}
+
+export function isFullDeckDescription(
+  deck: DeckDescription,
+): deck is FullDeckDescription {
+  return typeof deck.type === 'string'
+}
+
+export type DeckDescription =
+  | HalfDeckDescription
+  | FullDeckDescription
 
 export interface DeckBuilder {
   type: DeckType
   name: string
   description: string
   display(card: number): string
-  generate(high?: boolean): Iterable<number>
+  generate(high?: boolean): IteratorObject<number>
 }
 
 export type DeckBuilders = Readonly<Record<DeckType, DeckBuilder>>
 
-function* range(start: number, end: number): Iterable<number> {
+function* range(start: number, end: number) {
   for (let i = start; i < end; i++) {
     yield i
   }
@@ -85,7 +110,7 @@ function* range(start: number, end: number): Iterable<number> {
 // a sort of hilbert curve to mix up the suits/"values"
 const loJokers = [0, 30, 21, 11, 20, 10, 31, 1]
 
-function* generateLoDeck(jokers: number): Iterable<number> {
+function* generateLoDeck(jokers: number) {
   // clubs
   yield* range(2, 10)
   yield* range(80, 85)
@@ -106,7 +131,7 @@ function* generateLoDeck(jokers: number): Iterable<number> {
 
 const hiJokers = [40, 70, 61, 51, 60, 50, 71, 41]
 
-function* generateHiDeck(jokers: number): Iterable<number> {
+function* generateHiDeck(jokers: number) {
   // clubs
   yield* range(42, 50)
   yield* range(100, 105)
@@ -125,12 +150,16 @@ function* generateHiDeck(jokers: number): Iterable<number> {
   }
 }
 
-function* generate2xDeck(jokers: number): Iterable<number> {
+export function isHighDeckCard(card: number): boolean {
+  return (card >= 40 && card < 80) || (card >= 100 && card < 120)
+}
+
+function* generate2xDeck(jokers: number) {
   yield* generateLoDeck(jokers)
   yield* generateHiDeck(jokers)
 }
 
-function* generateTarotDeck(): Iterable<number> {
+function* generateTarotDeck() {
   // clubs and spades form the major arcana
   // clubs
   yield* range(0, 10)
@@ -195,6 +224,13 @@ export const deckBuilders: DeckBuilders = Object.freeze({
     description:
       'A deck consisting of letters with points in roughly English distribution',
     display: everdeckLetterEmoji,
+    generate: () => range(0, 120),
+  },
+  word: {
+    type: 'word',
+    name: 'Word Deck',
+    description: 'A deck consisting of words',
+    display: everdeckWord,
     generate: () => range(0, 120),
   },
   animal: {

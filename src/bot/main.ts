@@ -1,18 +1,25 @@
-export function handler(req: Request): Response {
-  const url = new URL(req.url)
+import { Client } from '@buape/carbon'
+import { createHandler } from '@buape/carbon/adapters/fetch'
+import { DeckCommand } from './commands/deck.ts'
 
-  if (url.pathname === '/api') {
-    return Response.json({
-      message: 'Hello, world!',
-      time: new Date().toISOString(),
-    })
-  }
+const BaseUrl = Deno.env.get('BASE_URL')
+const DeploySecret = Deno.env.get('DEPLOY_SECRET')
+const ClientId = Deno.env.get('DISCORD_CLIENT_ID')
+const PublicKey = Deno.env.get('DISCORD_PUBLIC_KEY')
+const Token = Deno.env.get('DISCORD_TOKEN')
+const devGuilds = Deno.env.get('DEV_GUILDS')?.split(',') ?? undefined
 
-  return new Response('<h1>Welcome to Deno!</h1>', {
-    headers: { 'content-type': 'text/html' },
-  })
-}
+const client = new Client({
+  baseUrl: BaseUrl!,
+  deploySecret: DeploySecret!,
+  clientId: ClientId!,
+  publicKey: PublicKey!,
+  token: Token!,
+  devGuilds,
+}, { commands: [new DeckCommand()] })
 
 if (import.meta.main) {
-  Deno.serve(handler)
+  const handler = createHandler(client)
+
+  Deno.serve((request) => handler(request, {}))
 }

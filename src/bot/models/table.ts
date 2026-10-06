@@ -128,6 +128,22 @@ export class CardSet {
     }
   }
 
+  shuffle(cardStates: Iterable<CardState>) {
+    const array = Array.from(cardStates)
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[array[i], array[j]] = [array[j], array[i]]
+    }
+    for (const card of array) {
+      this.#cardState.push(card)
+      this.#deckCounts.set(
+        card.deckId,
+        (this.#deckCounts.get(card.deckId) ?? 0) + 1,
+      )
+    }
+    this.#deckMap = undefined
+  }
+
   at(index: number): CardState | undefined {
     return this.#cardState[index]
   }
@@ -368,7 +384,7 @@ export function getTable(kv: Deno.Kv, tableId: string) {
 export function updateTable(
   kv: Deno.Kv,
   table: TableStore,
-  versionstamp?: string,
+  versionstamp?: string | null,
 ) {
   if (versionstamp) {
     return kv.atomic()
