@@ -162,9 +162,10 @@ export class DeckCommand extends TableTransactionCommand {
     const type = interaction.options.getString('type', true) as DeckType
     const name = interaction.options.getString('name', true)
     placeDeck(state, dealer, type, name)
-    // TODO: Table display
-    return Promise.resolve(
-      `Placed deck "${name}" of type "${type}" on the table.`,
-    )
+    // TODO: Table display?
+    return Promise.resolve({
+      content: `<@${interaction.user!.id}> placed deck ${name} on the table.`,
+      ephemeral: false,
+    })
   }
 }
