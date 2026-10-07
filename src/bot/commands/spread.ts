@@ -1,5 +1,5 @@
 import type { CommandInteraction, MessagePayload } from '@buape/carbon'
-import { findDealerDeck, TableState, displaySet } from '../models/table.ts'
+import { displaySet, findDealerDeck, TableState } from '../models/table.ts'
 import { TableTransactionCommand } from './table-tx.ts'
 
 export class SpreadCommand extends TableTransactionCommand {
