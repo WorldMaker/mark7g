@@ -11,7 +11,7 @@ export class TableCommand extends TableViewCommand {
     state: TableState,
   ): Promise<MessagePayload> {
     const sets = state.sets.map((_set, idx) => displaySet(state, idx))
-    const table = sets.join('\n\n')
+    const table = sets.join('\n')
     return Promise.resolve({
       content: table,
       ephemeral: false,

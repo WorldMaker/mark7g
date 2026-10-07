@@ -7,7 +7,7 @@ import {
   isHalfDeck,
   isLowHalfDeckDescription,
 } from '../models/deck.ts'
-import { DrawPileMarker, markClosed } from '../models/everdeck.ts'
+import { DrawPileMarker, markClosed, SpreadMarker } from '../models/everdeck.ts'
 import { TableTransactionCommand } from './table-tx.ts'
 import { type CommandInteraction, MessagePayload } from '@buape/carbon'
 
@@ -85,11 +85,11 @@ export function placeDeck(
   }
   if (!options?.noSpread) {
     table.sets.push({
-      type: DrawPileMarker,
+      type: SpreadMarker,
       name: `${name}`,
       dealer: !options?.public,
     })
-    table.state.push(new CardSet(DrawPileMarker))
+    table.state.push(new CardSet(SpreadMarker))
     spread = table.state.length - 1
   }
 

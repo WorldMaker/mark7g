@@ -30,7 +30,7 @@ export class SpreadCommand extends TableTransactionCommand {
         ephemeral: true,
       })
     }
-    if (!deck.draw || !deck.spread) {
+    if (deck.draw === null || deck.spread === null) {
       return Promise.resolve({
         content:
           'The deck you are dealing does not have a default draw pile or spread.',
