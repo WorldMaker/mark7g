@@ -1,7 +1,6 @@
 import type { CommandInteraction, MessagePayload } from '@buape/carbon'
-import { findDealerDeck, TableState } from '../models/table.ts'
+import { findDealerDeck, TableState, displaySet } from '../models/table.ts'
 import { TableTransactionCommand } from './table-tx.ts'
-import { deckBuilders } from '../models/deck.ts'
 
 export class SpreadCommand extends TableTransactionCommand {
   name = 'spread'
@@ -32,7 +31,6 @@ export class SpreadCommand extends TableTransactionCommand {
         ephemeral: true,
       })
     }
-    const builder = deckBuilders[deck.type]
     if (!deck.draw || !deck.spread) {
       return Promise.resolve({
         content:
@@ -61,7 +59,7 @@ export class SpreadCommand extends TableTransactionCommand {
       spread.push(draw.pop()!)
     }
     return Promise.resolve({
-      content: `**${spreadInfo.name}** ${spread.display(builder)}`,
+      content: displaySet(table, deck.spread),
       ephemeral: false,
     })
   }
