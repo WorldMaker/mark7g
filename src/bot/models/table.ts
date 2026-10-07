@@ -1,4 +1,4 @@
-import { DeckDescription } from './deck.ts'
+import { DeckBuilder, DeckDescription, DeckInfo, DeckType, isFullDeckDescription, isHighHalfDeckDescription } from './deck.ts'
 import {
   DeckMarker,
   DeckMarkers,
@@ -7,6 +7,7 @@ import {
   DrawPileMarker,
   HandMarker,
   isDeckMarker,
+  isPile,
   isSet,
   SpreadMarker,
 } from './everdeck.ts'
@@ -165,6 +166,20 @@ export class CardSet {
 
   [Symbol.iterator](): Iterator<CardState> {
     return this.#cardState[Symbol.iterator]()
+  }
+
+  display(deckBuilder: DeckBuilder): string {
+    if (isPile(this.#type)) {
+        const top = this.#cardState.at(-1)
+        const topDisplay = top ? deckBuilder.display(top?.cardId) : ''
+        return `${topDisplay} (${this.length})`
+    } else if (this.#type === SpreadMarker) {
+        const cards = this.#cardState.map(card => deckBuilder.display(card.cardId))
+        return cards.join(' ')
+    } else {
+        const cards = this.#cardState.map(_ => '🎴')
+        return cards.join(' ')
+    }
   }
 
   get length(): number {
@@ -391,6 +406,23 @@ export function deserialize(table: TableStore): TableState {
     state,
   }
 }
+
+interface DeckResult extends DeckInfo {
+  type: DeckType
+}
+
+export function findDealerDeck(table: TableState, dealer: string): DeckResult | undefined {
+  for (const deck of table.decks) {
+    if (isFullDeckDescription(deck) && deck.dealer === dealer) {
+      return deck
+    } else if (!isFullDeckDescription(deck) && deck.low.dealer === dealer) {
+      return { type: deck.type[0], ...deck.low }
+    } else if (isHighHalfDeckDescription(deck) && deck.high.dealer === dealer) {
+      return { type: deck.type[1], ...deck.high }
+    }
+  }
+  return undefined
+} 
 
 export function getTable(kv: Deno.Kv, tableId: string) {
   return kv.get<TableStore>(['table', tableId])

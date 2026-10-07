@@ -38,12 +38,17 @@ export abstract class TableTransactionCommand extends Command {
       const messagePayload = await this.updateTable(interaction, state)
 
       const updatedStore = serialize(state)
-      await updateTable(kv, updatedStore, result.versionstamp)
+      const updated = await updateTable(kv, updatedStore, result.versionstamp)
 
-      await interaction.reply(messagePayload)
+      if (updated.ok) {
+        await interaction.reply(messagePayload)
+      } else {
+        console.error('Failed to update table:', interaction.channel!.id, updated)
+        await interaction.reply({ content: 'Failed to update table.', ephemeral: true })
+      }
     } catch (error) {
       console.error('Failed to update table:', interaction.channel!.id, error)
-      interaction.reply('Failed to update table.')
+      interaction.reply({ content: 'Failed to update table.', ephemeral: true })
     } finally {
       kv.close()
     }
