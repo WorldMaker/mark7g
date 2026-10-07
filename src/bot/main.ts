@@ -1,9 +1,10 @@
 import { Client } from '@buape/carbon'
 import { createHandler } from '@buape/carbon/adapters/fetch'
 import { DeckCommand } from './commands/deck.ts'
+import { DiscardCommand } from './commands/discard/index.ts'
+import { ReshuffleCommand } from './commands/reshuffle.ts'
 import { SpreadCommand } from './commands/spread.ts'
 import { TableCommand } from './commands/table.ts'
-import { DiscardCommand } from './commands/discard/index.ts'
 
 const BaseUrl = Deno.env.get('BASE_URL')
 const DeploySecret = Deno.env.get('DEPLOY_SECRET')
@@ -23,6 +24,7 @@ const client = new Client({
   commands: [
     new DeckCommand(),
     new DiscardCommand(),
+    new ReshuffleCommand(),
     new SpreadCommand(),
     new TableCommand(),
   ],
