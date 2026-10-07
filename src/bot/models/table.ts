@@ -1,9 +1,10 @@
 import {
-  DeckBuilder,
+  deckBuilders,
   DeckDescription,
   DeckInfo,
   DeckType,
   isFullDeckDescription,
+  isHighDeckCard,
   isHighHalfDeckDescription,
 } from './deck.ts'
 import {
@@ -173,22 +174,6 @@ export class CardSet {
 
   [Symbol.iterator](): Iterator<CardState> {
     return this.#cardState[Symbol.iterator]()
-  }
-
-  display(deckBuilder: DeckBuilder): string {
-    if (isPile(this.#type)) {
-      const top = this.#cardState.at(-1)
-      const topDisplay = top ? deckBuilder.display(top?.cardId) : ''
-      return `${topDisplay} (${this.length})`
-    } else if (this.#type === SpreadMarker) {
-      const cards = this.#cardState.map((card) =>
-        deckBuilder.display(card.cardId)
-      )
-      return cards.join(' ')
-    } else {
-      const cards = this.#cardState.map((_) => '🎴')
-      return cards.join(' ')
-    }
   }
 
   get length(): number {
@@ -434,6 +419,34 @@ export function findDealerDeck(
     }
   }
   return undefined
+}
+
+function displayCard(table: TableState, card: CardState): string {
+  const maybeDeckType = table.decks[card.deckId]!.type
+  const deckType = Array.isArray(maybeDeckType)
+    ? (isHighDeckCard(card.cardId) ? maybeDeckType[1] : maybeDeckType[0])
+    : maybeDeckType
+  return deckBuilders[deckType!].display(card.cardId)
+}
+
+export function displaySet(table: TableState, setIndex: number): string {
+  if (setIndex < 0 || setIndex >= table.sets.length) {
+    throw new Error(`Invalid set index: ${setIndex}`)
+  }
+  const info = table.sets[setIndex]!
+  const set = table.state[setIndex]!
+  if (isPile(info.type)) {
+    const top = set.at(-1)
+    const topDisplay = top ? displayCard(table, top) : ''
+    return `**${info.name}** \t${topDisplay} (${set.size()})`
+  } else if (info.type === SpreadMarker) {
+    const cards = Iterator.from(set).map((card) => displayCard(table, card))
+      .toArray()
+    return `**${info.name}** \t${cards.join(' ')}`
+  } else {
+    const cards = Iterator.from(set).map((_) => '🎴').toArray()
+    return `**${info.name}** \t${cards.join(' ')}`
+  }
 }
 
 export function getTable(kv: Deno.Kv, tableId: string) {
