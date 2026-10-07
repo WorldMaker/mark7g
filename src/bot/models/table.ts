@@ -458,7 +458,7 @@ export function displaySet(table: TableState, setIndex: number): string {
   if (isPile(info.type)) {
     const top = set.at(-1)
     const topDisplay = top ? displayCard(table, top) : ''
-    return `**${info.name}** \t${topDisplay} (${set.size()})`
+    return `**${info.name}** \t${topDisplay} (${set.length})`
   } else if (info.type === SpreadMarker) {
     const cards = Iterator.from(set).map((card) => displayCard(table, card))
       .toArray()
