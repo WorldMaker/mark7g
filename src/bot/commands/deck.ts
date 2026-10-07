@@ -1,4 +1,4 @@
-import { CardSet, CardState, TableState } from '../models/table.ts'
+import { CardSet, CardState, displaySet, TableState } from '../models/table.ts'
 import {
   deckBuilders,
   DeckInfo,
@@ -127,6 +127,10 @@ export function placeDeck(
       type: type,
     }
   }
+  return {
+    ...info,
+    type,
+  }
 }
 
 export class DeckCommand extends TableTransactionCommand {
@@ -163,10 +167,11 @@ export class DeckCommand extends TableTransactionCommand {
     const dealer = interaction.user!.id
     const type = interaction.options.getString('type', true) as DeckType
     const name = interaction.options.getString('name', true)
-    placeDeck(state, dealer, type, name)
-    // TODO: Table display?
+    const info = placeDeck(state, dealer, type, name)
     return Promise.resolve({
-      content: `<@${interaction.user!.id}> placed deck ${name} on the table.`,
+      content: `${info.draw !== null ? displaySet(state, info.draw) : ''}\n${
+        info.discard !== null ? displaySet(state, info.discard) : ''
+      }\n${info.spread !== null ? displaySet(state, info.spread) : ''}`,
       ephemeral: false,
     })
   }
