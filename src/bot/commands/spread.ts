@@ -11,7 +11,6 @@ export class SpreadCommand extends TableTransactionCommand {
       type: 4, // ApplicationCommandOptionType.Integer,
       description: 'Number of cards to spread',
       required: false,
-      default: 1,
     },
   ]
 
