@@ -3,6 +3,7 @@ import { createHandler } from '@buape/carbon/adapters/fetch'
 import { DeckCommand } from './commands/deck.ts'
 import { SpreadCommand } from './commands/spread.ts'
 import { TableCommand } from './commands/table.ts'
+import { DiscardCommand } from './commands/discard/index.ts'
 
 const BaseUrl = Deno.env.get('BASE_URL')
 const DeploySecret = Deno.env.get('DEPLOY_SECRET')
@@ -18,7 +19,14 @@ const client = new Client({
   publicKey: PublicKey!,
   token: Token!,
   devGuilds,
-}, { commands: [new DeckCommand(), new SpreadCommand(), new TableCommand()] })
+}, {
+  commands: [
+    new DeckCommand(),
+    new DiscardCommand(),
+    new SpreadCommand(),
+    new TableCommand(),
+  ],
+})
 
 if (import.meta.main) {
   const handler = createHandler(client)
