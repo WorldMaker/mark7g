@@ -24,6 +24,14 @@ export function isClosed(card: number): boolean {
   return (card & ClosedFlag) !== 0
 }
 
+export function markClosed(card: number): number {
+  return card | ClosedFlag
+}
+
+export function unmarkClosed(card: number): number {
+  return card & ~ClosedFlag
+}
+
 export function flipClosed(card: number): number {
   return card ^ ClosedFlag
 }

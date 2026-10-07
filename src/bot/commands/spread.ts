@@ -55,7 +55,8 @@ export class SpreadCommand extends TableTransactionCommand {
       })
     }
     for (let i = 0; i < count; i++) {
-      spread.push(draw.pop()!)
+      // default face up
+      spread.push(draw.pop()!.unclose())
     }
     return Promise.resolve({
       content: displaySet(table, deck.spread),
