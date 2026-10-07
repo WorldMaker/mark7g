@@ -1,5 +1,5 @@
 import type { CommandInteraction, MessagePayload } from '@buape/carbon'
-import { findDealerDeck, TableState } from '../../models/table.ts'
+import { displaySet, findDealerDeck, TableState } from '../../models/table.ts'
 import { TableTransactionCommand } from '../table-tx.ts'
 
 export class SpreadCommand extends TableTransactionCommand {
@@ -44,13 +44,14 @@ export class SpreadCommand extends TableTransactionCommand {
         ephemeral: true,
       })
     }
-    const count = spread.length
-    while (spread.length > 0) {
-      // default face up
-      discard.push(spread.pop()!.unclose())
-    }
+
+    // default face up
+    discard.append(spread.clear()!.map((card) => card.unclose()))
+
     return Promise.resolve({
-      content: `Discarded ${count} cards from ${spreadInfo.name}.`,
+      content: `${displaySet(table, deck.spread)}\n${
+        displaySet(table, deck.discard)
+      }`,
       ephemeral: false,
     })
   }
