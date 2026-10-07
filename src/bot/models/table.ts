@@ -142,6 +142,12 @@ export class CardSet {
     this.#deckCounts.set(deckId, (this.#deckCounts.get(deckId) ?? 0) + 1)
   }
 
+  append(cardStates: Iterable<CardState>) {
+    for (const cardState of cardStates) {
+      this.push(cardState)
+    }
+  }
+
   pop() {
     const cardState = this.#cardState.pop()
     if (cardState) {

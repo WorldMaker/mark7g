@@ -39,20 +39,21 @@ export class ReshuffleCommand extends TableTransactionCommand {
         ephemeral: true,
       })
     }
-    const count = interaction.options.getInteger('count') ?? 1
-    if (count > draw.length) {
+
+    if (discard.length === 0) {
       return Promise.resolve({
-        content:
-          `Cannot spread ${count} cards. Only ${draw.length} cards available in the draw pile.`,
+        content: `No cards in the discard pile to reshuffle.`,
         ephemeral: true,
       })
     }
-    for (let i = 0; i < count; i++) {
-      // default face down
-      draw.shuffle(discard.clear().map((card) => card.close()))
-    }
+
+    // default face down
+    draw.shuffle(discard.clear().map((card) => card.close()))
+
     return Promise.resolve({
-      content: displaySet(table, deck.discard),
+      content: `${displaySet(table, deck.discard)}\n${
+        displaySet(table, deck.draw)
+      }`,
       ephemeral: false,
     })
   }
