@@ -13,11 +13,15 @@ import {
   DeckNumberMarker,
   DiscardPileMarker,
   DrawPileMarker,
+  flipClosed,
   HandMarker,
+  isClosed,
   isDeckMarker,
   isPile,
   isSet,
+  markClosed,
   SpreadMarker,
+  unmarkClosed,
 } from './everdeck.ts'
 
 const TableExpiration = 2 /* hr */ * 60 /* min */ * 60 /* sec */ * 1000 /* ms */
@@ -37,6 +41,22 @@ export class CardState {
 
   get cardId() {
     return this.#cardId
+  }
+
+  isClosed() {
+    return isClosed(this.#cardId)
+  }
+
+  close() {
+    return new CardState(this.#deckId, markClosed(this.#cardId))
+  }
+
+  unclose() {
+    return new CardState(this.#deckId, unmarkClosed(this.#cardId))
+  }
+
+  flip() {
+    return new CardState(this.#deckId, flipClosed(this.#cardId))
   }
 
   size(deckMap: DeckMap): number {

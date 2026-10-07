@@ -7,7 +7,7 @@ import {
   isHalfDeck,
   isLowHalfDeckDescription,
 } from '../models/deck.ts'
-import { DrawPileMarker } from '../models/everdeck.ts'
+import { DrawPileMarker, markClosed } from '../models/everdeck.ts'
 import { TableTransactionCommand } from './table-tx.ts'
 import { type CommandInteraction, MessagePayload } from '@buape/carbon'
 
@@ -67,7 +67,9 @@ export function placeDeck(
     })
     const pile = new CardSet(DrawPileMarker)
     pile.shuffle(
-      deckBuilder.generate(isHigh).map((card) => new CardState(deckId, card)),
+      deckBuilder.generate(isHigh).map((card) =>
+        new CardState(deckId, markClosed(card))
+      ),
     )
     table.state.push(pile)
     draw = table.state.length - 1
