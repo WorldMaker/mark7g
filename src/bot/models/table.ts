@@ -1,4 +1,11 @@
-import { DeckBuilder, DeckDescription, DeckInfo, DeckType, isFullDeckDescription, isHighHalfDeckDescription } from './deck.ts'
+import {
+  DeckBuilder,
+  DeckDescription,
+  DeckInfo,
+  DeckType,
+  isFullDeckDescription,
+  isHighHalfDeckDescription,
+} from './deck.ts'
 import {
   DeckMarker,
   DeckMarkers,
@@ -170,15 +177,17 @@ export class CardSet {
 
   display(deckBuilder: DeckBuilder): string {
     if (isPile(this.#type)) {
-        const top = this.#cardState.at(-1)
-        const topDisplay = top ? deckBuilder.display(top?.cardId) : ''
-        return `${topDisplay} (${this.length})`
+      const top = this.#cardState.at(-1)
+      const topDisplay = top ? deckBuilder.display(top?.cardId) : ''
+      return `${topDisplay} (${this.length})`
     } else if (this.#type === SpreadMarker) {
-        const cards = this.#cardState.map(card => deckBuilder.display(card.cardId))
-        return cards.join(' ')
+      const cards = this.#cardState.map((card) =>
+        deckBuilder.display(card.cardId)
+      )
+      return cards.join(' ')
     } else {
-        const cards = this.#cardState.map(_ => '🎴')
-        return cards.join(' ')
+      const cards = this.#cardState.map((_) => '🎴')
+      return cards.join(' ')
     }
   }
 
@@ -411,7 +420,10 @@ interface DeckResult extends DeckInfo {
   type: DeckType
 }
 
-export function findDealerDeck(table: TableState, dealer: string): DeckResult | undefined {
+export function findDealerDeck(
+  table: TableState,
+  dealer: string,
+): DeckResult | undefined {
   for (const deck of table.decks) {
     if (isFullDeckDescription(deck) && deck.dealer === dealer) {
       return deck
@@ -422,7 +434,7 @@ export function findDealerDeck(table: TableState, dealer: string): DeckResult | 
     }
   }
   return undefined
-} 
+}
 
 export function getTable(kv: Deno.Kv, tableId: string) {
   return kv.get<TableStore>(['table', tableId])

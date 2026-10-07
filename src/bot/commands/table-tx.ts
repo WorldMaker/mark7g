@@ -43,8 +43,15 @@ export abstract class TableTransactionCommand extends Command {
       if (updated.ok) {
         await interaction.reply(messagePayload)
       } else {
-        console.error('Failed to update table:', interaction.channel!.id, updated)
-        await interaction.reply({ content: 'Failed to update table.', ephemeral: true })
+        console.error(
+          'Failed to update table:',
+          interaction.channel!.id,
+          updated,
+        )
+        await interaction.reply({
+          content: 'Failed to update table.',
+          ephemeral: true,
+        })
       }
     } catch (error) {
       console.error('Failed to update table:', interaction.channel!.id, error)
