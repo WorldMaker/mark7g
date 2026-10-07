@@ -172,6 +172,14 @@ export class CardSet {
     }
   }
 
+  clear() {
+    const oldCardState = this.#cardState
+    this.#cardState = []
+    this.#deckCounts.clear()
+    this.#deckMap = undefined
+    return oldCardState
+  }
+
   shuffle(cardStates: Iterable<CardState>) {
     const array = Array.from(cardStates)
     for (let i = array.length - 1; i > 0; i--) {
